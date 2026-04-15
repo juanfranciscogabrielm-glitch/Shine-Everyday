@@ -2,21 +2,24 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Tienda - Shine Bag</title>
+<title>Marketplace Avanzado</title>
 
 <style>
+
 body{
-font-family: Arial;
-background:#f5f5f5;
 margin:0;
+font-family:Arial;
+background:#ebebeb;
 }
+
+/* HEADER */
 
 header{
 background:#ffe600;
-padding:15px;
 display:flex;
-justify-content:space-between;
 align-items:center;
+padding:10px 20px;
+gap:20px;
 }
 
 .logo{
@@ -25,144 +28,374 @@ font-weight:bold;
 }
 
 .search{
-width:40%;
-padding:8px;
+flex:1;
+padding:10px;
+border:none;
+border-radius:6px;
 }
 
-.cart{
+.icons{
+display:flex;
+gap:15px;
+}
+
+.icon{
 background:white;
-padding:8px 15px;
-border-radius:10px;
+padding:8px 12px;
+border-radius:8px;
 cursor:pointer;
 }
 
-.container{
+/* CATEGORIAS */
+
+.categories{
+display:flex;
+gap:15px;
+padding:10px 20px;
+background:white;
+border-bottom:1px solid #ddd;
+}
+
+.cat{
+cursor:pointer;
+}
+
+/* PRODUCTOS */
+
+.products{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
 gap:20px;
 padding:20px;
 }
 
-.product{
+.card{
 background:white;
-padding:10px;
 border-radius:10px;
-text-align:center;
+padding:10px;
+position:relative;
+transition:0.2s;
 }
 
-.product img{
+.card:hover{
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+.card img{
 width:100%;
-height:200px;
+height:180px;
 object-fit:cover;
 }
 
 .price{
-color:green;
 font-size:20px;
+color:#00a650;
+}
+
+.star{
+color:gold;
+}
+
+.fav{
+position:absolute;
+right:10px;
+top:10px;
+cursor:pointer;
+font-size:18px;
 }
 
 button{
 background:#3483fa;
 color:white;
 border:none;
-padding:10px;
-margin-top:10px;
-cursor:pointer;
+padding:8px;
 border-radius:5px;
+cursor:pointer;
+margin-top:5px;
 }
 
-#carrito{
+/* CARRITO */
+
+#cart{
 position:fixed;
-right:0;
+right:-380px;
 top:0;
-width:300px;
+width:380px;
 height:100%;
 background:white;
-box-shadow:-2px 0 10px rgba(0,0,0,0.2);
+box-shadow:-4px 0 15px rgba(0,0,0,0.2);
 padding:20px;
-display:none;
+transition:0.3s;
 overflow:auto;
 }
+
+.cart-item{
+border-bottom:1px solid #ddd;
+padding:10px 0;
+}
+
+.remove{
+color:red;
+cursor:pointer;
+}
+
+.qty{
+display:flex;
+gap:5px;
+margin-top:5px;
+}
+
+.qty button{
+background:#ddd;
+color:black;
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="logo">Shine Bag</div>
-<input class="search" placeholder="Buscar productos...">
-<div class="cart" onclick="mostrarCarrito()">🛒 Carrito (<span id="contador">0</span>)</div>
+
+<div class="logo">Mi Mercado</div>
+
+<input class="search" id="search" placeholder="Buscar productos">
+
+<div class="icons">
+
+<div class="icon" onclick="toggleCart()">
+🛒 <span id="cartCount">0</span>
+</div>
+
+<div class="icon">
+❤️ <span id="favCount">0</span>
+</div>
+
+</div>
+
 </header>
 
-<div class="container">
+<div class="categories">
 
-<div class="product">
-<img src="https://via.placeholder.com/200">
-<h3>Cartera Shine Negra</h3>
-<p class="price">$15.000</p>
-<button onclick="agregar('Cartera Shine Negra',15000)">Agregar al carrito</button>
-</div>
-
-<div class="product">
-<img src="https://via.placeholder.com/200">
-<h3>Cartera Shine Blanca</h3>
-<p class="price">$17.000</p>
-<button onclick="agregar('Cartera Shine Blanca',17000)">Agregar al carrito</button>
-</div>
-
-<div class="product">
-<img src="https://via.placeholder.com/200">
-<h3>Cartera Shine Rosa</h3>
-<p class="price">$18.000</p>
-<button onclick="agregar('Cartera Shine Rosa',18000)">Agregar al carrito</button>
-</div>
+<div class="cat" onclick="filterCat('all')">Todo</div>
+<div class="cat" onclick="filterCat('carteras')">Carteras</div>
+<div class="cat" onclick="filterCat('mochilas')">Mochilas</div>
+<div class="cat" onclick="filterCat('accesorios')">Accesorios</div>
 
 </div>
 
-<div id="carrito">
+<div class="products" id="products"></div>
+
+<div id="cart">
+
 <h2>Carrito</h2>
-<ul id="lista"></ul>
+
+<div id="cartItems"></div>
+
 <h3>Total: $<span id="total">0</span></h3>
-<button onclick="comprar()">Comprar</button>
+
+<button onclick="buy()">Comprar</button>
+
 </div>
 
 <script>
-let carrito=[]
-let total=0
 
-function agregar(nombre,precio){
-carrito.push({nombre,precio})
-total+=precio
+let products=[
+{nombre:"Cartera Negra",precio:15000,categoria:"carteras",img:"https://via.placeholder.com/300"},
+{nombre:"Cartera Rosa",precio:17000,categoria:"carteras",img:"https://via.placeholder.com/300"},
+{nombre:"Mochila Urbana",precio:22000,categoria:"mochilas",img:"https://via.placeholder.com/300"},
+{nombre:"Cartera Blanca",precio:18000,categoria:"carteras",img:"https://via.placeholder.com/300"},
+{nombre:"Bolso Moda",precio:21000,categoria:"accesorios",img:"https://via.placeholder.com/300"}
+]
 
-document.getElementById("contador").innerText=carrito.length
-actualizar()
+let cart=JSON.parse(localStorage.getItem("cart"))||[]
+let fav=JSON.parse(localStorage.getItem("fav"))||[]
+
+function renderProducts(lista){
+
+let container=document.getElementById("products")
+
+container.innerHTML=""
+
+lista.forEach((p,i)=>{
+
+container.innerHTML+=`
+
+<div class="card">
+
+<div class="fav" onclick="addFav(${i})">❤️</div>
+
+<img src="${p.img}">
+
+<h3>${p.nombre}</h3>
+
+<div class="star">★★★★★</div>
+
+<p class="price">$${p.precio}</p>
+
+<button onclick="addCart(${i})">Agregar al carrito</button>
+
+</div>
+
+`
+
+})
+
 }
 
-function actualizar(){
-let lista=document.getElementById("lista")
-lista.innerHTML=""
+renderProducts(products)
 
-carrito.forEach(p=>{
-let li=document.createElement("li")
-li.innerText=p.nombre+" - $"+p.precio
-lista.appendChild(li)
+function addCart(i){
+
+let prod=products[i]
+
+let found=cart.find(p=>p.nombre==prod.nombre)
+
+if(found){
+
+found.qty++
+
+}else{
+
+cart.push({...prod,qty:1})
+
+}
+
+saveCart()
+
+updateCart()
+
+}
+
+function updateCart(){
+
+let items=document.getElementById("cartItems")
+
+items.innerHTML=""
+
+let total=0
+
+cart.forEach((p,i)=>{
+
+total+=p.precio*p.qty
+
+items.innerHTML+=`
+
+<div class="cart-item">
+
+${p.nombre} - $${p.precio}
+
+<div class="qty">
+
+<button onclick="changeQty(${i},-1)">-</button>
+
+${p.qty}
+
+<button onclick="changeQty(${i},1)">+</button>
+
+<span class="remove" onclick="remove(${i})">❌</span>
+
+</div>
+
+</div>
+
+`
+
 })
 
 document.getElementById("total").innerText=total
+document.getElementById("cartCount").innerText=cart.length
+
 }
 
-function mostrarCarrito(){
-let c=document.getElementById("carrito")
-c.style.display=c.style.display=="block"?"none":"block"
+function changeQty(i,n){
+
+cart[i].qty+=n
+
+if(cart[i].qty<=0){
+
+cart.splice(i,1)
+
 }
 
-function comprar(){
+saveCart()
+
+updateCart()
+
+}
+
+function remove(i){
+
+cart.splice(i,1)
+
+saveCart()
+
+updateCart()
+
+}
+
+function toggleCart(){
+
+let c=document.getElementById("cart")
+
+c.style.right=c.style.right=="0px"?"-380px":"0px"
+
+}
+
+function addFav(i){
+
+fav.push(products[i])
+
+localStorage.setItem("fav",JSON.stringify(fav))
+
+document.getElementById("favCount").innerText=fav.length
+
+}
+
+function filterCat(cat){
+
+if(cat=="all"){
+
+renderProducts(products)
+
+}else{
+
+renderProducts(products.filter(p=>p.categoria==cat))
+
+}
+
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+
+let text=e.target.value.toLowerCase()
+
+renderProducts(products.filter(p=>p.nombre.toLowerCase().includes(text)))
+
+})
+
+function saveCart(){
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+}
+
+function buy(){
+
 alert("Compra realizada")
-carrito=[]
-total=0
-actualizar()
-document.getElementById("contador").innerText=0
+
+cart=[]
+
+saveCart()
+
+updateCart()
+
 }
+
+updateCart()
+
+document.getElementById("favCount").innerText=fav.length
+
 </script>
 
 </body>
