@@ -1,104 +1,169 @@
-Build a complete modern luxury handbag e-commerce website called "Shine Bag".
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tienda - Shine Bag</title>
 
-Tech stack:
-HTML5, CSS3, JavaScript (vanilla).
+<style>
+body{
+font-family: Arial;
+background:#f5f5f5;
+margin:0;
+}
 
-Design inspiration:
-Luxury fashion brand websites such as Louis Vuitton or high-end handbag stores. 
-Clean, elegant, minimal UI with modern animations.
+header{
+background:#ffe600;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-Main Features:
+.logo{
+font-size:24px;
+font-weight:bold;
+}
 
-HEADER
-- Logo: Shine Bag
-- Navigation:
-  Home
-  Shop
-  New Arrivals
-  Best Sellers
-  Instagram
-- Icons:
-  Search
-  User account
-  Shopping cart
+.search{
+width:40%;
+padding:8px;
+}
 
-HERO SECTION
-- Full width banner
-- Dark elegant background
-- Fashion model with handbags
-- Large luxury typography
+.cart{
+background:white;
+padding:8px 15px;
+border-radius:10px;
+cursor:pointer;
+}
 
-Text:
-Shine Bag
-Elegancia que brilla contigo
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+padding:20px;
+}
 
-Button:
-Comprar ahora
+.product{
+background:white;
+padding:10px;
+border-radius:10px;
+text-align:center;
+}
 
-PRODUCT SECTION (New Arrivals)
-- 4 product cards per row
-- Each card includes:
-  product image
-  product title
-  price
-  add to cart button
-  favorite heart icon
-- Hover animation
+.product img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
 
-BEST SELLERS
-- Grid layout with large product images
-- Elegant spacing and shadows
+.price{
+color:green;
+font-size:20px;
+}
 
-COLLECTION SECTION
-- Colored background cards with handbags
-- Pastel colors:
-  green
-  beige
-  blue
-  pink
-  orange
+button{
+background:#3483fa;
+color:white;
+border:none;
+padding:10px;
+margin-top:10px;
+cursor:pointer;
+border-radius:5px;
+}
 
-SHOPPING CART
-- JavaScript functionality
-- Add products
-- Remove products
-- Update quantity
-- Show total price
-- Cart icon with item counter
+#carrito{
+position:fixed;
+right:0;
+top:0;
+width:300px;
+height:100%;
+background:white;
+box-shadow:-2px 0 10px rgba(0,0,0,0.2);
+padding:20px;
+display:none;
+overflow:auto;
+}
+</style>
+</head>
 
-STYLE
-- Luxury typography
-- Colors:
-  black
-  white
-  beige
-  light gray
-  gold accents
+<body>
 
-ANIMATIONS
-- Smooth hover effects
-- Fade in sections
-- Button hover transitions
+<header>
+<div class="logo">Shine Bag</div>
+<input class="search" placeholder="Buscar productos...">
+<div class="cart" onclick="mostrarCarrito()">🛒 Carrito (<span id="contador">0</span>)</div>
+</header>
 
-FOOTER
-- Instagram: shine_everyday.ok
-- Brand: Shine Bag
-- Links:
-  Contact
-  About
-  Terms
+<div class="container">
 
-RESPONSIVE DESIGN
-- Desktop
-- Tablet
-- Mobile
+<div class="product">
+<img src="https://via.placeholder.com/200">
+<h3>Cartera Shine Negra</h3>
+<p class="price">$15.000</p>
+<button onclick="agregar('Cartera Shine Negra',15000)">Agregar al carrito</button>
+</div>
 
-Project structure:
+<div class="product">
+<img src="https://via.placeholder.com/200">
+<h3>Cartera Shine Blanca</h3>
+<p class="price">$17.000</p>
+<button onclick="agregar('Cartera Shine Blanca',17000)">Agregar al carrito</button>
+</div>
 
-shine-bag-store/
-index.html
-style.css
-script.js
-assets/images/
+<div class="product">
+<img src="https://via.placeholder.com/200">
+<h3>Cartera Shine Rosa</h3>
+<p class="price">$18.000</p>
+<button onclick="agregar('Cartera Shine Rosa',18000)">Agregar al carrito</button>
+</div>
 
-Make the design look premium, modern and similar to luxury fashion e-commerce websites.
+</div>
+
+<div id="carrito">
+<h2>Carrito</h2>
+<ul id="lista"></ul>
+<h3>Total: $<span id="total">0</span></h3>
+<button onclick="comprar()">Comprar</button>
+</div>
+
+<script>
+let carrito=[]
+let total=0
+
+function agregar(nombre,precio){
+carrito.push({nombre,precio})
+total+=precio
+
+document.getElementById("contador").innerText=carrito.length
+actualizar()
+}
+
+function actualizar(){
+let lista=document.getElementById("lista")
+lista.innerHTML=""
+
+carrito.forEach(p=>{
+let li=document.createElement("li")
+li.innerText=p.nombre+" - $"+p.precio
+lista.appendChild(li)
+})
+
+document.getElementById("total").innerText=total
+}
+
+function mostrarCarrito(){
+let c=document.getElementById("carrito")
+c.style.display=c.style.display=="block"?"none":"block"
+}
+
+function comprar(){
+alert("Compra realizada")
+carrito=[]
+total=0
+actualizar()
+document.getElementById("contador").innerText=0
+}
+</script>
+
+</body>
+</html>
